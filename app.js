@@ -124,7 +124,8 @@
 
   /* quiz: multiple choice from picture */
   function newQuiz() {
-    const p = pool().filter(c => !isProp(c)); if (p.length < 4) return quizState = null;
+    // concept cards of the chosen topic; the kind filter is hidden in Quiz, so it must not apply here
+    const p = DECK.filter(c => !isProp(c) && (S.settings.topic === 'All' || c.topic === S.settings.topic)); if (p.length < 4) return quizState = null;
     const due = p.filter(isDue), src = due.length && Math.random() < 0.6 ? due : p;
     const c = src[Math.random() * src.length | 0];
     const same = shuffle(DECK.filter(x => !isProp(x) && x.id !== c.id && x.topic === c.topic)), other = shuffle(DECK.filter(x => !isProp(x) && x.id !== c.id && x.topic !== c.topic));
