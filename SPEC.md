@@ -1,9 +1,8 @@
 # Network & Society Flashcards: functional specification
 
-Version 2.0 (draft, 2026-10-27). Covers the whole app as it works today, plus the planned redesign: LaTeX-typeset card fronts and black-and-white diagrams.
+Version 2.0 (2026-10-27). Covers the whole app as it works today, plus the redesign: every card typeset in LaTeX, diagrams drawn in TikZ, and a minimal black-and-white interface with a LaTeX feel.
 
 Status tags: **[existing]** already works this way and must keep working, **[new]** to be built, **[changed]** works today but will change.
-Priority: **Must** / **Should** / **Could**.
 
 ---
 
@@ -11,18 +10,19 @@ Priority: **Must** / **Should** / **Could**.
 
 A personal spaced-repetition flashcard app for network science and sociology. It holds two card types (concepts and propositions), schedules reviews with an SM-2-style algorithm, and adds a quiz, a browsable card list and progress statistics.
 
-Out of scope: user accounts, syncing between devices, a card editor in the UI, audio, images other than generated SVG diagrams.
+Out of scope: user accounts, syncing between devices, a card editor in the UI, audio, images other than the TikZ diagrams.
 
 ## 2. Platform and constraints
 
-| ID | Requirement | Status | Priority |
-|---|---|---|---|
-| NF-1 | Static web app: `index.html` + plain JS + CSS. No build step, no package manager. | existing | Must |
-| NF-2 | Works opened directly from disk (`file://`) and from any static server. | existing | Must |
-| NF-3 | Works offline. Any third-party library (KaTeX) is stored in the repo under `vendor/`, not loaded from a CDN. | new | Must |
-| NF-4 | Script load order: `vendor/katex/*`, `diagrams.js`, `deck.js`, `props.js`, `app.js`. | changed | Must |
-| NF-5 | Usable at phone width (≥ 360 px) with no horizontal scrolling. | existing | Must |
-| NF-6 | Respects `prefers-reduced-motion` (no flip animation). | existing | Should |
+| ID | Requirement | Status |
+|---|---|---|
+| NF-1 | Static web app: `index.html` + plain JS + CSS. The app itself has no build step and no package manager. | existing |
+| NF-2 | Works opened directly from disk (`file://`) and from any static server. | existing |
+| NF-3 | Works offline. Third-party code (KaTeX) is stored in the repo under `vendor/`, never loaded from a CDN. | new |
+| NF-4 | Diagrams are the only built asset: TikZ sources in `diagrams/` compile to one generated file, `diagrams.js`, which is committed. Running the app never needs TeX; only editing a diagram does. | new |
+| NF-5 | Script load order: `vendor/katex/katex.min.js`, `diagrams.js`, `deck.js`, `props.js`, `app.js`. | changed |
+| NF-6 | Usable at phone width (≥ 360 px) with no horizontal scrolling. | existing |
+| NF-7 | Respects `prefers-reduced-motion` (no flip animation). | existing |
 
 ## 3. Card content model
 
@@ -30,13 +30,14 @@ Out of scope: user accounts, syncing between devices, a card editor in the UI, a
 
 | Field | Meaning | Required |
 |---|---|---|
-| `id` | kebab-case, unique across all cards. Never renamed or reused (progress is keyed by it). | yes |
+| `id` | kebab-case, unique across all cards. Never renamed or reused: progress is keyed by it. | yes |
 | `topic` | one of `Structure`, `Centrality`, `Ties & communities`, `Sociology`, `Dynamics` (via `T.*`). | yes |
 | `name` | the concept to recall. | yes |
 | `def` | 1–3 sentence definition. | yes |
-| `formula` | key formula. | no |
+| `formula` | key formula, pure LaTeX math. | no |
 | `tip` | memory hook. | yes |
-| `vis` | function returning an SVG string. | no |
+
+A concept has a diagram if and only if `diagrams/<id>.tex` exists. **[changed]** (The old `vis` field and the SVG toolkit `D` are removed.)
 
 ### 3.2 Proposition cards (`props.js`, array `PROPS`, appended to `DECK`)
 
@@ -44,23 +45,25 @@ Out of scope: user accounts, syncing between devices, a card editor in the UI, a
 |---|---|---|
 | `id` | `p-` prefix, unique. | yes |
 | `name` | the claim, as a full sentence. | yes |
-| `def` | the argument: proof sketch, mechanism or evidence. HTML allowed. | yes |
+| `def` | the argument: proof sketch, mechanism or evidence. | yes |
 | `src` | source citation. | yes |
 | `ref` | id of an existing concept whose diagram decorates the back. | yes |
 
 `type: 'prop'` and `topic: 'Propositions'` are added automatically. **[existing]**
 
-### 3.3 LaTeX in card text **[new]**
+### 3.3 LaTeX card text **[new]**
 
-| ID | Requirement | Priority |
-|---|---|---|
-| C-1 | `formula` holds pure LaTeX math with no delimiters, e.g. ``String.raw`k_i = \sum_j A_{ij}` ``. It is rendered as display math. | Must |
-| C-2 | `name`, `def` and prop `name` may contain inline math between `$…$`, e.g. ``String.raw`Giant component appears when $\langle k\rangle > 1$` ``. | Must |
-| C-3 | Fields containing backslashes are written with ``String.raw`…` `` so authors type `\sum`, not `\\sum`. | Must |
-| C-4 | A literal dollar sign is written `\$`. | Must |
-| C-5 | Text-mode commands `\emph{}`, `\textbf{}`, `--` (en dash) and `---` (em dash) are supported in front text. Other text-mode LaTeX is not. | Should |
-| C-6 | All 27 existing formulas are converted from Unicode pseudo-math (`Σ_j A_ij`) to LaTeX. Math inside prop claims and inside concept definitions (shown on reverse-mode fronts) is converted to `$…$`. | Must |
-| C-7 | The back's HTML (`<code>`, `&lt;`) keeps working. Converting `<code>` math on the back to `$…$` is optional. | Could |
+Every text field of every card (`name`, `def`, `formula`, `tip`, `src`) is LaTeX-flavoured text, rendered in the browser with KaTeX. HTML in card data is no longer allowed.
+
+| ID | Requirement |
+|---|---|
+| C-1 | `formula` is pure LaTeX math with no delimiters, rendered as display math: ``String.raw`k_i = \sum_j A_{ij}` ``. |
+| C-2 | All other fields are text with inline math between `$…$` and display math between `\[…\]`. |
+| C-3 | Fields containing backslashes are written with ``String.raw`…` `` so authors type `\sum`, not `\\sum`. |
+| C-4 | Supported text-mode markup: `\emph{}`, `\textbf{}`, `\textsc{}`, `--` (en dash), `---` (em dash), `~` (non-breaking space), ` ``…'' ` (curly quotes), `\$` (literal dollar). Everything else outside math is shown literally (so `&`, `%`, `<` need no escaping). |
+| C-5 | All math currently written in Unicode pseudo-math (`Σ_j A_ij`, `⟨k⟩`, `<code>…</code>`, `&lt;`) is converted to LaTeX. |
+| C-6 | No card text refers to colour. Tips that do today ("Green = bonding", "One red neighbour", "S (blue) → I (red)", …) are rewritten for the black-and-white diagrams. |
+| C-7 | If KaTeX cannot parse an expression, that expression is shown as raw source in typewriter type, the rest of the card renders, and a warning naming the card id is logged. |
 
 ## 4. Views
 
@@ -78,65 +81,42 @@ The header has four tabs: **Study**, **Quiz**, **Browse**, **Stats**. The active
 | S-6 | Rating removes the card from the queue. **Again** re-inserts it after the next 3 cards. |
 | S-7 | When the queue is empty: "All caught up", the time of the next scheduled review (if any), and two buttons: **Start new session** (S-1 again) and **Cram everything** (all cards in the filter, shuffled, ignoring due dates). |
 
-### 4.2 Card faces
+### 4.2 Card faces **[existing content, changed typesetting]**
 
-#### Front **[changed]**
-
-| Card | Front shows |
-|---|---|
-| Concept, direction *Concept → definition* | topic, name, diagram (if diagrams are on), prompt "Define it in your own words.", hint "Space = flip" |
-| Concept, direction *Definition → concept* | topic, definition, formula (if any), prompt "Which concept is this?", hint |
-| Proposition | topic, claim, prompt "Why is this true? Reconstruct the argument.", hint |
-
-The front must never leak the answer (no definition in a forward front's diagram caption, no conclusion in a proposition prompt). **[existing]**
-
-#### Front typesetting **[new]**
-
-| ID | Requirement | Priority |
+| Card | Front | Back |
 |---|---|---|
-| F-1 | All front text is set in Computer Modern (the KaTeX_Main font shipped with KaTeX). | Must |
-| F-2 | Inline and display math (C-1, C-2) is rendered with KaTeX. | Must |
-| F-3 | Black text on a white page. No colour on the front anywhere. | Must |
-| F-4 | Layout reads like a typeset LaTeX page: topic as a small-caps label top left (like `\textsc`), concept name or claim centred as a title, prompt in italics (like `\emph`), hint in black at a smaller size. | Must |
-| F-5 | No drop shadow, no rounded pill for the topic. The card is a plain rectangle with a thin black border (radius ≤ 2 px). | Must |
-| F-6 | If KaTeX cannot parse an expression, the raw source is shown in monospace, the rest of the card still renders, and a warning is logged to the console. | Must |
-| F-7 | In dark theme the front inverts: near-white ink on near-black paper. | Should |
-| F-8 | Long claims and definitions stay readable: the front scrolls inside the card rather than overflowing. | Must |
+| Concept, *Concept → definition* | topic, name, diagram (if diagrams on), prompt "Define it in your own words.", hint "Space = flip" | topic, name, definition, formula, tip, diagram |
+| Concept, *Definition → concept* | topic, definition, formula, prompt "Which concept is this?", hint | topic, name, tip, diagram |
+| Proposition | topic, claim, prompt "Why is this true? Reconstruct the argument.", hint | topic, claim, argument, source, diagram of the `ref` concept |
 
-#### Back **[existing]**
+Back diagrams appear only when diagrams are on. The front must never leak the answer: no definition in a forward front's diagram caption, no conclusion in a proposition prompt.
 
-| Card | Back shows |
-|---|---|
-| Concept, forward | topic, name, definition, formula, tip, diagram |
-| Concept, reverse | topic, name, tip, diagram |
-| Proposition | topic, claim (small), argument, source, diagram of the `ref` concept |
+Both faces are typeset like a LaTeX page (§6): topic as a small-caps label top left, name or claim centred as a title, definition and argument as justified body text, formula as centred display math, tip set off as an italic remark, source in small type, prompt in italics.
 
-Diagrams appear on the back only when diagrams are on. Back formulas should render with KaTeX too, so a formula looks the same on both sides. **[changed, Should]** Restyling the rest of the back is out of scope for this version (see §9).
+### 4.3 Quiz
 
-### 4.3 Quiz **[existing]**
-
-| ID | Requirement |
-|---|---|
-| Q-1 | Uses concept cards from the current topic only (propositions excluded), ignoring the kind filter. Needs at least 4; otherwise shows a message. **[changed]** Known bug today: the quiz still applies the hidden kind filter, so with "Propositions only" selected in Study the quiz says it has no cards. |
-| Q-2 | Picks the target from due cards 60 % of the time when any are due, otherwise from all concept cards. |
-| Q-3 | Shows the target's definition and (if diagrams are on) its diagram, plus four name options: the answer and three distractors, same-topic distractors first. |
-| Q-4 | Pick by click or keys 1–4. The right option is marked correct and a wrong pick marked wrong (B&W: see D-9). |
-| Q-5 | A correct pick counts as **Good**, a wrong one as **Again**, in the scheduler and the daily log. |
-| Q-6 | After picking: name, topic, formula, tip, and **Next →** (or Space / Enter). |
+| ID | Requirement | Status |
+|---|---|---|
+| Q-1 | Uses concept cards from the current topic only (propositions excluded), ignoring the kind filter. Needs at least 4; otherwise shows a message. | changed (bug fix: today the hidden kind filter still applies, so with "Propositions only" chosen in Study the quiz says it has no cards) |
+| Q-2 | Picks the target from due cards 60 % of the time when any are due, otherwise from all concept cards. | existing |
+| Q-3 | Shows the target's definition and (if diagrams are on) its diagram, plus four name options: the answer and three distractors, same-topic distractors first. | existing |
+| Q-4 | Pick by click or keys 1–4. After picking, the correct option is marked ✓ and set in bold; a wrong pick is marked ✗ and struck through. | changed |
+| Q-5 | A correct pick counts as **Good**, a wrong one as **Again**, in the scheduler and the daily log. | existing |
+| Q-6 | After picking: name, topic, formula, tip, and **Next →** (or Space / Enter). | existing |
 
 ### 4.4 Browse **[existing]**
 
 | ID | Requirement |
 |---|---|
 | B-1 | Grid of all cards in the current topic and kind filter. |
-| B-2 | Search box filters by name and definition (case-insensitive). |
-| B-3 | Each tile shows topic, diagram (concepts only, always shown regardless of the diagrams toggle) and name. Clicking a tile toggles its details: definition, formula, and tip (concept) or source (proposition). |
+| B-2 | Search box filters by name and definition (case-insensitive, matched against the LaTeX source). |
+| B-3 | Each tile shows topic, diagram (concepts only, regardless of the diagrams toggle) and name. Clicking a tile toggles its details: definition, formula, and tip (concept) or source (proposition). |
 
 ### 4.5 Stats **[existing]**
 
 | ID | Requirement |
 |---|---|
-| T-1 | Tiles: cards seen / total, mature cards (interval ≥ 21 days), due now, reviews today, day streak. Computed over the whole deck, ignoring filters. |
+| T-1 | Figures: cards seen / total, mature cards (interval ≥ 21 days), due now, reviews today, day streak. Computed over the whole deck, ignoring filters. |
 | T-2 | Streak = consecutive days with at least one review, counting back from today (or from yesterday if nothing has been reviewed yet today). |
 | T-3 | One progress bar per topic: cards seen / cards in topic. |
 | T-4 | **Export progress** downloads `flashcards-progress.json` with cards, log and settings. |
@@ -156,7 +136,23 @@ New card state: `ease 2.5, interval 0, due 0, reps 0, lapses 0`. On rating:
 
 For Hard / Good / Easy the interval is rounded, at least 1 day, and due = now + interval days. Every rating increments `reps` and adds 1 to today's count in the log.
 
-## 6. Controls, settings and persistence **[existing]**
+## 6. Visual design **[new]**
+
+The whole interface, not only the cards, should feel like a well-typeset LaTeX document: minimal, polished, math-oriented.
+
+| ID | Requirement |
+|---|---|
+| V-1 | **Type.** Computer Modern throughout: KaTeX's fonts (KaTeX_Main for text, KaTeX_Math for math, KaTeX_Typewriter for keys and code). No sans-serif anywhere. |
+| V-2 | **No colour.** Ink (black) on paper (white). No hue in any element: header, tabs, buttons, cards, quiz feedback, stats, diagrams. |
+| V-3 | **Grey only with meaning.** A grey tone is allowed only when it carries information, e.g. a quantity such as tie strength or an opinion value, or a region such as a confidence interval. Never for decoration, borders, secondary text or hover states. |
+| V-4 | Hierarchy comes from size, weight, italics and small caps, as in LaTeX, not from colour or shadows. Secondary text (hints, counters) is black, smaller and/or italic. |
+| V-5 | Rules, not boxes: thin black lines (≈ 0.4–0.8 px) for card borders, header rule and dividers. No shadows, no rounded pills, corner radius 0. |
+| V-6 | Controls look like typeset text: tabs and buttons in small caps with a thin rule; the active tab is shown by inverting (white on black) or underlining. Rating buttons carry no colour, only their label, key and interval. |
+| V-7 | Generous margins and a narrow measure (≈ 40 em for body text), centred like a page. Body text justified with hyphenation on the card back. |
+| V-8 | Dark theme inverts ink and paper (near-white on near-black). It follows the system setting by default; the toggle overrides it. Every distinction in the light theme must survive the inversion, including diagram greys. |
+| V-9 | Keyboard focus stays visible (a thin dotted black outline). |
+
+## 7. Controls, settings and persistence **[existing]**
 
 | ID | Requirement |
 |---|---|
@@ -168,68 +164,53 @@ For Hard / Good / Easy the interval is rounded, at least 1 day, and due = now + 
 | P-6 | Settings defaults: view Study, direction forward, kind All, diagrams on, topic All, `newLimit` 10, theme system. |
 | P-7 | The storage format does not change in this version, so existing progress survives the redesign. |
 
-### Keyboard **[existing]**
+Keyboard: in Study, Space / Enter flips and 1–4 rate (after flipping); in Quiz, 1–4 pick and Space / Enter goes to the next question after answering. Shortcuts are ignored while typing in an input, select or textarea, and when Ctrl / Cmd is held.
 
-| Key | Study | Quiz |
+## 8. Diagrams (TikZ) **[new]**
+
+### 8.1 Sources and build
+
+| ID | Requirement |
+|---|---|
+| D-1 | One file per diagram, `diagrams/<card id>.tex`, holding only a `tikzpicture` environment. |
+| D-2 | A shared preamble, `diagrams/preamble.tex`, defines the libraries and every named style (§8.3). Diagram files use those styles rather than raw line widths or fills, so the look can be changed in one place. |
+| D-3 | Every picture uses the `card` style: a fixed 200 × 140 canvas (5 cm × 3.5 cm), origin top left, y pointing down, so all diagrams share one scale and text size. |
+| D-4 | `node build-diagrams.js` compiles each changed `.tex` with `latex` and converts it with `dvisvgm --no-fonts` (glyphs become paths, so no font files are needed). It then writes `diagrams.js`: `const DIAGRAMS = { id: '<svg…>' }`. Unchanged files are skipped (content hash); `--all` forces a full rebuild. |
+| D-5 | The build post-processes each SVG: removes the XML header and fixed width/height (keeps the viewBox), prefixes every internal id with the card id so many diagrams can sit on one page, and maps black to the ink colour, white to the paper colour and greys to an ink/paper mix (V-8). |
+| D-6 | A LaTeX error stops the build for that file and prints the file name and the relevant log lines. Other files still build. The previous `diagrams.js` entry is kept. |
+| D-7 | Intermediate files go to `diagrams/build/`, which git ignores. |
+
+### 8.2 Display
+
+| ID | Requirement |
+|---|---|
+| D-8 | The app shows `DIAGRAMS[id]` for a concept, and `DIAGRAMS[ref]` for a proposition. A card without a diagram shows none. |
+| D-9 | Diagrams scale to the width available (front: up to ≈ 300 px wide; back, quiz and browse: up to ≈ 520 px) and keep their aspect ratio. |
+
+### 8.3 Visual vocabulary
+
+| Element | Style |
+|---|---|
+| Node, default | small open circle (white fill, thin black outline) |
+| Node, emphasised (the node the card is about, an active / infected / adopting node, or group 1 when two groups are compared) | filled black, labels in white |
+| Second group | open circle; a third category uses a different shape (square), not a grey |
+| Removed node | dashed outline |
+| Size | node size encodes degree or importance where the concept is about that |
+| Tie | thin solid line |
+| Emphasised tie (the tie the card is about) | thicker solid line |
+| Strong vs weak tie | thick solid vs thin dashed |
+| Absent or potential tie | dotted |
+| Signed tie | positive solid, negative dashed, signs written as $+$ / $-$ |
+| Directed tie | arrow with a LaTeX-style tip |
+| Labels and captions | Computer Modern, math in math mode ($k_i$, $\sigma_{st}$, $\varepsilon$), captions in `\footnotesize` |
+| Grey | only per V-3: opinion values (white → black ramp), tie weights, a shaded interval |
+
+## 9. Validation
+
+| ID | Requirement | Status |
 |---|---|---|
-| Space / Enter | flip | next question (after answering) |
-| 1–4 | rate (after flip) | pick option |
-
-Shortcuts are ignored while typing in an input, select or textarea, and when Ctrl / Cmd is held.
-
-## 7. Diagrams
-
-### 7.1 Toolkit **[existing]**
-
-`diagrams.js` exposes `D`: `D.svg(nodes, edges, opts)`, `D.ring`, `D.union`, `D.bars`, `D.t`, `D.op`, `D.frame`. All diagrams use a 200 × 140 viewBox. Node and edge specs keep their current shape, so `deck.js` diagram code keeps working.
-
-### 7.2 Black-and-white style **[new]**
-
-| ID | Requirement | Priority |
-|---|---|---|
-| D-1 | Diagrams use only ink (black) and paper (white), plus one light grey tone. No hue anywhere, on front, back, quiz or browse. | Must |
-| D-2 | The existing colour classes keep their names but map to B&W styles, so most card code needs no edits (table below). | Must |
-| D-3 | Node labels contrast with their node: white on black or grey nodes, black on white nodes. | Must |
-| D-4 | Labels and captions use the same Computer Modern font as the front. Captions in italics. | Must |
-| D-5 | `D.op(v)` (opinion in [0,1]) maps to a white → black grey ramp instead of blue → orange. | Must |
-| D-6 | Every diagram whose meaning depends on telling groups apart (about 28 of 46, e.g. homophily, Schelling, balance, SIR, communities, echo chambers) stays readable in B&W. Where the class mapping is not enough, that diagram is adjusted by hand. | Must |
-| D-7 | Dark theme inverts ink and paper; distinctions between classes survive the inversion. | Should |
-| D-8 | Strokes are thin and uniform, TikZ-like: default edge ≈ 1 px, highlighted edge ≈ 2.5 px. | Should |
-| D-9 | Quiz correct / wrong marking uses B&W: correct = black fill with white text plus ✓, wrong = struck through plus ✗. | Should |
-
-Class mapping:
-
-| Class | Was | Becomes |
-|---|---|---|
-| `n` neutral node | grey | white fill, black outline |
-| `a` primary node | blue | solid black |
-| `b` second group | red | light grey fill, black outline |
-| `c` third group | green | white fill, black outline, black centre dot |
-| `d` focal / emphasis | amber | solid black with white inner ring |
-| `e` fifth group | purple | white fill, dotted black outline |
-| edge default | grey | thin black |
-| `hl` | orange, thick | black, thick |
-| `ghost` | faint dotted | light grey dotted |
-| `pos` / `neg` (signed ties) | green solid / red dashed | black solid / black dashed |
-| `amb` | amber | black dash-dot |
-| bars `a` / `b` / `n` | blue / red / grey | black / light grey / white outlined |
-| Venn sets 1 / 2 / 3 | coloured fills | outlines only: solid / dashed / dotted |
-| Schelling cells | blue / red | black / light grey; unhappy = thick outline |
-| band, rings, axis, ✗ marks | coloured | light grey / black |
-
-Card text never refers to diagram colours (checked: no colour words in `deck.js` or `props.js`). New cards must keep it that way.
-
-## 8. Validation
-
-| ID | Requirement | Status | Priority |
-|---|---|---|---|
-| V-1 | A node one-liner checks: every card renders, ids are unique, every `ref` resolves, no SVG contains `NaN` or `undefined`. | existing | Must |
-| V-2 | The validator also runs KaTeX over every `formula` and every `$…$` span and reports parse errors by card id. | new | Must |
-| V-3 | The validator flags any hex colour, `rgb(`, or `color-mix(` left in generated SVG. | new | Should |
-| V-4 | The `add-flashcards` skill documents the LaTeX conventions (C-1 to C-5), the B&W class meanings (§7.2) and the new validator. | new | Must |
-
-## 9. Open questions
-
-1. **Back of the card.** This spec only retypesets the front (plus back formulas and diagrams). Should the back get the same LaTeX look, so the flip does not jump from serif to sans?
-2. **Pure black and white, or one grey?** §7.2 allows one light grey to separate a second group. Strictly two tones would mean hatching patterns instead, which are hard to read on 6 px nodes.
-3. **App chrome.** Header, tabs and rating buttons still use the blue accent and coloured borders. Make them monochrome too?
+| X-1 | A node check script, `node check.js`, verifies: ids are unique, every `ref` resolves, every concept diagram file has a matching card and vice versa (reported, not an error, for concepts without a diagram). | changed |
+| X-2 | It runs KaTeX over every `formula` and every `$…$` / `\[…\]` span and reports parse errors by card id. | new |
+| X-3 | It flags HTML tags or entities left in card text, and colour words in card text. | new |
+| X-4 | It checks `diagrams.js`: one entry per diagram file, and no colour other than ink, paper and greys in any SVG. | new |
+| X-5 | The `add-flashcards` skill documents the LaTeX text conventions (§3.3), the TikZ workflow and styles (§8), and `check.js`. | new |
