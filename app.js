@@ -38,6 +38,7 @@
 
   /* ── helpers ── */
   const isProp = c => c.type === 'prop';
+  const tx = (c, k) => TeX.text(c[k], c.id);   /* card text is typeset by tex.js (KaTeX for math) */
   /* diagrams are compiled from diagrams/<id>.tex into diagrams.js; a proposition borrows its ref's diagram */
   const visOf = c => (typeof DIAGRAMS !== 'undefined' && DIAGRAMS[isProp(c) ? c.ref : c.id]) || '';
   const pool = () => DECK.filter(c => (S.settings.topic === 'All' || c.topic === S.settings.topic) && (S.settings.kind === 'All' || (S.settings.kind === 'prop') === isProp(c)));
@@ -77,14 +78,14 @@
     const vis = visOf(c), chip = `<span class="chip">${c.topic}</span>`;
     let front, back;
     if (isProp(c)) {
-      front = `${chip}<div class="claim">${c.name}</div><p class="prompt">Why is this true? Reconstruct the argument.</p><p class="hint">Space = flip</p>`;
-      back = `${chip}<p class="claimsm">${c.name}</p><div class="argument">${c.def}</div><p class="src">${c.src}</p>${spark && vis ? `<div class="vis small">${vis}</div>` : ''}`;
+      front = `${chip}<div class="claim">${tx(c, 'name')}</div><p class="prompt">Why is this true? Reconstruct the argument.</p><p class="hint">Space = flip</p>`;
+      back = `${chip}<p class="claimsm">${tx(c, 'name')}</p><div class="argument">${tx(c, 'def')}</div><p class="src">${tx(c, 'src')}</p>${spark && vis ? `<div class="vis small">${vis}</div>` : ''}`;
     } else if (fwd) {
-      front = `${chip}<div class="big-name">${c.name}</div>${spark && vis ? `<div class="vis small">${vis}</div>` : ''}<p class="prompt">Define it in your own words.</p><p class="hint">Space = flip</p>`;
-      back = `${chip}<h2>${c.name}</h2><p class="def">${c.def}</p>${c.formula ? `<div class="formula">${c.formula}</div>` : ''}<p class="tip">${c.tip}</p>${spark && vis ? `<div class="vis small">${vis}</div>` : ''}`;
+      front = `${chip}<div class="big-name">${tx(c, 'name')}</div>${spark && vis ? `<div class="vis small">${vis}</div>` : ''}<p class="prompt">Define it in your own words.</p><p class="hint">Space = flip</p>`;
+      back = `${chip}<h2>${tx(c, 'name')}</h2><p class="def">${tx(c, 'def')}</p>${c.formula ? `<div class="formula">${tx(c, 'formula')}</div>` : ''}<p class="tip">${tx(c, 'tip')}</p>${spark && vis ? `<div class="vis small">${vis}</div>` : ''}`;
     } else {
-      front = `${chip}<div class="claim">${c.def}</div>${c.formula ? `<div class="formula">${c.formula}</div>` : ''}<p class="prompt">Which concept is this?</p><p class="hint">Space = flip</p>`;
-      back = `${chip}<h2>${c.name}</h2><p class="tip">${c.tip}</p>${spark && vis ? `<div class="vis small">${vis}</div>` : ''}`;
+      front = `${chip}<div class="claim">${tx(c, 'def')}</div>${c.formula ? `<div class="formula">${tx(c, 'formula')}</div>` : ''}<p class="prompt">Which concept is this?</p><p class="hint">Space = flip</p>`;
+      back = `${chip}<h2>${tx(c, 'name')}</h2><p class="tip">${tx(c, 'tip')}</p>${spark && vis ? `<div class="vis small">${vis}</div>` : ''}`;
     }
     const st = S.cards[c.id];
     view.innerHTML = `<div class="meta"><span>${queue.length} left in session</span><span>${st && st.reps ? 'reviewed ' + st.reps + '×' : 'new card'}</span></div>
@@ -127,10 +128,10 @@
     if (!quizState) newQuiz();
     if (!quizState) { view.innerHTML = '<p class="center">Quiz needs at least 4 concept cards in this selection.</p>'; return; }
     const { c, opts, picked, vis } = quizState;
-    view.innerHTML = `<div class="quiz-vis"><p class="claim" style="font-size:1.05rem">${c.def}</p>${vis}</div><div class="opts">${opts.map((o, i) => {
+    view.innerHTML = `<div class="quiz-vis"><p class="claim" style="font-size:1.05rem">${tx(c, 'def')}</p>${vis}</div><div class="opts">${opts.map((o, i) => {
       const cls = picked == null ? '' : o.id === c.id ? 'ok' : o.id === picked ? 'bad' : '';
-      return `<button class="${cls}" data-id="${o.id}" ${picked != null ? 'disabled' : ''}><kbd>${i + 1}</kbd>${o.name}</button>`;
-    }).join('')}</div>${picked != null ? `<div class="reveal"><b>${c.name}</b> (${c.topic})${c.formula ? `<div class="formula">${c.formula}</div>` : ''}<p class="tip" style="text-align:left">${c.tip}</p><button class="btn primary" id="nq">Next →</button></div>` : ''}`;
+      return `<button class="${cls}" data-id="${o.id}" ${picked != null ? 'disabled' : ''}><kbd>${i + 1}</kbd>${tx(o, 'name')}</button>`;
+    }).join('')}</div>${picked != null ? `<div class="reveal"><b>${tx(c, 'name')}</b> (${c.topic})${c.formula ? `<div class="formula">${tx(c, 'formula')}</div>` : ''}<p class="tip" style="text-align:left">${tx(c, 'tip')}</p><button class="btn primary" id="nq">Next →</button></div>` : ''}`;
     view.querySelectorAll('.opts button').forEach(b => b.onclick = () => pick(b.dataset.id));
     const n = $('#nq'); if (n) n.onclick = () => { newQuiz(); render(); };
   }
@@ -146,7 +147,7 @@
     const draw = () => {
       const q = $('#q').value.toLowerCase();
       $('#grid').innerHTML = pool().filter(c => !q || (c.name + c.def).toLowerCase().includes(q)).map(c =>
-        `<div class="tile" data-id="${c.id}"><span class="chip">${c.topic}</span>${isProp(c) ? '' : visOf(c)}<h3>${c.name}</h3><div class="more">${c.def}${c.formula ? `<div class="formula">${c.formula}</div>` : ''}${isProp(c) ? `<p class="src">${c.src}</p>` : `<p class="tip">${c.tip}</p>`}</div></div>`).join('');
+        `<div class="tile" data-id="${c.id}"><span class="chip">${c.topic}</span>${isProp(c) ? '' : visOf(c)}<h3>${tx(c, 'name')}</h3><div class="more">${tx(c, 'def')}${c.formula ? `<div class="formula">${tx(c, 'formula')}</div>` : ''}${isProp(c) ? `<p class="src">${tx(c, 'src')}</p>` : `<p class="tip">${tx(c, 'tip')}</p>`}</div></div>`).join('');
       document.querySelectorAll('.tile').forEach(t => t.onclick = () => t.classList.toggle('open'));
     };
     $('#q').oninput = draw; draw();

@@ -20,7 +20,7 @@ Out of scope: user accounts, syncing between devices, a card editor in the UI, a
 | NF-2 | Works opened directly from disk (`file://`) and from any static server. | existing |
 | NF-3 | Works offline. Third-party code (KaTeX) is stored in the repo under `vendor/`, never loaded from a CDN. | new |
 | NF-4 | Diagrams are the only built asset: TikZ sources in `diagrams/` compile to one generated file, `diagrams.js`, which is committed. Running the app never needs TeX; only editing a diagram does. | new |
-| NF-5 | Script load order: `vendor/katex/katex.min.js`, `diagrams.js`, `deck.js`, `props.js`, `app.js`. | changed |
+| NF-5 | Script load order: `vendor/katex/katex.min.js`, `tex.js`, `diagrams.js`, `deck.js`, `props.js`, `app.js`. | changed |
 | NF-6 | Usable at phone width (≥ 360 px) with no horizontal scrolling. | existing |
 | NF-7 | Respects `prefers-reduced-motion` (no flip animation). | existing |
 
@@ -53,17 +53,17 @@ A concept has a diagram if and only if `diagrams/<id>.tex` exists. **[changed]**
 
 ### 3.3 LaTeX card text **[new]**
 
-Every text field of every card (`name`, `def`, `formula`, `tip`, `src`) is LaTeX-flavoured text, rendered in the browser with KaTeX. HTML in card data is no longer allowed.
+Every text field of every card (`name`, `def`, `formula`, `tip`, `src`) is rendered by `tex.js`, which typesets it the way LaTeX would and renders math with KaTeX. The existing card content is not rewritten: this version only guarantees the format and that content renders correctly.
 
 | ID | Requirement |
 |---|---|
-| C-1 | `formula` is pure LaTeX math with no delimiters, rendered as display math: ``String.raw`k_i = \sum_j A_{ij}` ``. |
-| C-2 | All other fields are text with inline math between `$…$` and display math between `\[…\]`. |
-| C-3 | Fields containing backslashes are written with ``String.raw`…` `` so authors type `\sum`, not `\\sum`. |
-| C-4 | Supported text-mode markup: `\emph{}`, `\textbf{}`, `\textsc{}`, `--` (en dash), `---` (em dash), `~` (non-breaking space), ` ``…'' ` (curly quotes), `\$` (literal dollar). Everything else outside math is shown literally (so `&`, `%`, `<` need no escaping). |
-| C-5 | All math currently written in Unicode pseudo-math (`Σ_j A_ij`, `⟨k⟩`, `<code>…</code>`, `&lt;`) is converted to LaTeX. |
-| C-6 | No card text refers to colour. Tips that do today ("Green = bonding", "One red neighbour", "S (blue) → I (red)", …) are rewritten for the black-and-white diagrams. |
-| C-7 | If KaTeX cannot parse an expression, that expression is shown as raw source in typewriter type, the rest of the card renders, and a warning naming the card id is logged. |
+| C-1 | Inline math between `$…$` and display math between `\[…\]`, in any field (including `formula`). |
+| C-2 | Fields containing backslashes are written with ``String.raw`…` `` so authors type `\sum`, not `\\sum`. Inside `String.raw` use straight quotes `"…"` (backticks would end the string). |
+| C-3 | Text-mode markup: `\emph{}`, `\textbf{}`, `\textsc{}`, `--` (en dash), `---` (em dash), `a~b` (non-breaking space; a spaced ` ~ ` stays literal), ` ``…'' ` and `"…"` (curly quotes), `'` (apostrophe), `\$` (literal dollar). |
+| C-4 | Existing content keeps rendering as before: plain text, Unicode math (`Σ_j A_ij`, `⟨k⟩`) and the HTML already in proposition arguments (`<code>`, `&lt;`). |
+| C-5 | No card text refers to diagram colours. (Done: the tips that did were rewritten with the TikZ diagrams.) |
+| C-6 | If KaTeX cannot parse an expression, that expression is shown as raw source in typewriter type, the rest of the card renders, and a warning naming the card id is logged. |
+| C-7 | Converting existing Unicode pseudo-math to `$…$` is optional content work, outside this version. |
 
 ## 4. Views
 
@@ -211,6 +211,6 @@ Keyboard: in Study, Space / Enter flips and 1–4 rate (after flipping); in Quiz
 |---|---|---|
 | X-1 | A node check script, `node check.js`, verifies: ids are unique, every `ref` resolves, every concept diagram file has a matching card and vice versa (reported, not an error, for concepts without a diagram). | changed |
 | X-2 | It runs KaTeX over every `formula` and every `$…$` / `\[…\]` span and reports parse errors by card id. | new |
-| X-3 | It flags HTML tags or entities left in card text, and colour words in card text. | new |
+| X-3 | It flags colour words in card text. | new |
 | X-4 | It checks `diagrams.js`: one entry per diagram file, and no colour other than ink, paper and greys in any SVG. | new |
 | X-5 | The `add-flashcards` skill documents the LaTeX text conventions (§3.3), the TikZ workflow and styles (§8), and `check.js`. | new |
