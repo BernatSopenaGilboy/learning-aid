@@ -1,43 +1,43 @@
 ---
 name: add-flashcards
-description: Add new concept or proposition cards to the network-science / sociology flashcard app in this project (deck.js, props.js), optionally with an SVG diagram. Use when the user asks to create, add, extend or fix flashcards.
+description: Add new concept or proposition cards to the network-science / sociology flashcard app in this project (deck.js, props.js), optionally with a TikZ diagram. Use when the user asks to create, add, extend or fix flashcards.
 ---
 
 # Adding flashcards to the Network & Society app
 
 ## How the app works (read first)
 
-A zero-dependency static web app. Open `index.html` directly, or serve the folder (`python -m http.server`). No build step.
+A static web app with a LaTeX look: open `index.html` directly, or serve the folder (`python -m http.server`). The app has no build step. Only diagrams are built: TikZ sources compile to `diagrams.js` (committed). `SPEC.md` is the full functional spec.
 
 | File | Role |
 |---|---|
-| `index.html` | Shell: header (tabs, topic / kind / direction selects, diagrams checkbox). Loads scripts in order: `diagrams.js`, `deck.js`, `props.js`, `app.js`. |
-| `diagrams.js` | SVG toolkit `D` (see below). Pure functions that return SVG strings. |
+| `index.html` | Shell. Loads `vendor/katex/katex.min.js`, `tex.js`, `diagrams.js`, `deck.js`, `props.js`, `app.js` in that order. |
 | `deck.js` | `const DECK = [...]`: **concept cards**. |
 | `props.js` | `const PROPS = [...]`: **proposition cards**, pushed onto `DECK`. |
+| `diagrams/<id>.tex` | One TikZ picture per concept card. `diagrams/preamble.tex` holds the shared styles. |
+| `build-diagrams.js` | Compiles changed diagrams (latex + dvisvgm, from MiKTeX) into `diagrams.js`. |
+| `tex.js` | Typesets card text: `$…$` / `\[…\]` math via KaTeX, `\emph{}` etc. |
 | `app.js` | Views (Study, Quiz, Browse, Stats), SM-2-lite scheduler, persistence. |
-| `style.css` | Themes (auto light/dark + toggle) and SVG classes. |
+| `check.js` | Validates cards, LaTeX and diagrams. |
+| `style.css` | Black-and-white, Computer Modern design (light/dark). |
 
 **Card types**
-- **Concept** (no `type` field): front = concept name (small diagram as a visual accent, optional), back = definition + formula + memory tip. A direction dropdown can flip it to Definition → concept.
-- **Proposition** (`type: 'prop'`, set automatically by `props.js`): front = a claim, back = the argument / theory / proof sketch + source. Diagram on the back comes from the concept named in `ref`.
+- **Concept** (no `type` field): front = name (+ diagram), back = *Definition.* + formula + *Remark.* (the tip) + diagram. A direction dropdown can flip it to Definition → concept.
+- **Proposition** (`type: 'prop'`, set automatically by `props.js`): front = **Proposition.** *claim*, back = *Proof sketch.* (the argument) + source + the diagram of the concept named in `ref`.
 
-**Study flow:** Space flips, keys 1–4 rate (Again / Hard / Good / Easy). Again re-queues within the session; others set `due` days ahead (SM-2-lite: ease starts 2.5, Good = ×ease, Easy = ×ease×1.3). The Quiz tab only uses concept cards (shows a definition, pick the name).
-
-**Persistence:** `localStorage` key `netsoc-flashcards-v1` stores `{cards: {id: {ease, interval, due, reps, lapses}}, log, settings}`. Progress is keyed by card `id`, so **never rename or reuse an existing id** (it would reset or mix up progress). Export/import JSON lives in the Stats tab.
+**Persistence:** `localStorage` key `netsoc-flashcards-v1`, keyed by card `id`, so **never rename or reuse an existing id**.
 
 ## Card schemas
 
 Concept (append to `DECK` in `deck.js`, inside the right topic section):
 ```js
 {
-  id: 'kebab-case-unique',          // unique across DECK and PROPS
+  id: 'kebab-case-unique',          // unique across DECK and PROPS; also the diagram file name
   topic: T.S,                       // T.S Structure | T.C Centrality | T.T Ties & communities | T.O Sociology | T.Y Dynamics
-  name: 'Concept name',             // what the learner must define
+  name: 'Concept name',
   def: 'One to three sentences. What it is, and what it is for.',
-  formula: 'k_i = Σ_j A_ij',        // optional
-  tip: 'Short mnemonic or intuition.',
-  vis: () => D.svg(nodes, edges, { over: cap('short caption') })   // optional but nice
+  formula: String.raw`$k_i = \sum_j A_{ij}$`,   // optional
+  tip: 'Short mnemonic or intuition.'
 }
 ```
 
@@ -46,41 +46,65 @@ Proposition (append to `PROPS` in `props.js`):
 {
   id: 'p-short-slug',               // prefix p-
   name: 'The claim, as a full sentence.',
-  def: 'The argument: premises, derivation or mechanism, evidence. HTML allowed (<code>…</code>, &lt; &gt;).',
+  def: String.raw`The argument: premises, derivation or mechanism, evidence. Math as $\langle k\rangle$.`,
   src: 'Author (year)',
   ref: 'existing-concept-id'        // whose diagram decorates the back (must exist in DECK)
 }
 ```
-The `.map(...)` at the end of `props.js` adds `type: 'prop'` and `topic: 'Propositions'`, so don't set them.
+The `.map(...)` at the end of `props.js` adds `type: 'prop'` and `topic: 'Propositions'`.
 
-## Procedure
+## Writing card text (LaTeX conventions)
 
-1. Read the tail of the relevant section of `deck.js` / `props.js` and grep ids to avoid duplicates (`Grep "id: 'candidate'"`).
-2. Ask yourself which type fits. Concepts: a *named thing* with a definition. Propositions: a *claim* that has an argument or proof. The front must make the learner **produce** the explanation, so the front must not leak the answer (no definition in a concept's diagram caption, no conclusion in a proposition's prompt).
-3. Write definitions that are correct and concise. For propositions, state the actual reasoning (a proof sketch, mechanism, or key evidence) and cite the source. Flag anything you are unsure of to the user rather than inventing a citation or number.
-4. Add the entry with the Edit tool (not shell heredocs: apostrophes and `$` break them). Escape apostrophes in single-quoted JS strings (`\'`) and use `&lt;` / `&gt;` inside HTML strings.
-5. Validate (see below), then preview in the browser (Browse tab shows every diagram; check light and dark).
+Every field goes through `tex.js`:
+- Inline math `$…$`, display math `\[…\]`, in any field including `formula`.
+- Any field with a backslash: write it as ``String.raw`…` `` so `\sum` needs no doubling. Inside `String.raw`, use straight quotes `"…"` (a backtick would end the string) and never write `${`.
+- Text markup: `\emph{}`, `\textbf{}`, `\textsc{}`, `--` en dash, `---` em dash, `a~b` non-breaking space, `"…"` or ` ``…'' ` curly quotes, `\$` literal dollar.
+- Plain text, Unicode symbols and the old HTML (`<code>`, `&lt;`) still render, but prefer `$…$` for math in new cards.
+- Never mention colours: diagrams are black and white (say "filled", "dashed", "dotted" instead).
 
-## Diagram toolkit (`diagrams.js`)
+## Diagrams (TikZ)
 
-All drawing happens in a 200×140 viewBox.
-- `D.svg(nodes, edges, opts)`: nodes are `[x, y, opts]` where `opts` is a colour class string (`n` grey, `a` blue, `b` red, `c` green, `d` amber, `e` purple) or `{c, r, l(label), f(fill css), s(stroke), sw, o(opacity), d(dashed outline)}`. Edges are `[i, j, 'classes']` with classes `hl dash ghost pos neg amb thick thin arrow both`. `opts.under` / `opts.over` inject raw SVG behind / in front.
-- `D.ring(n, cx, cy, r, offDeg)` → points on a circle (use `pts(arr, o)` in `deck.js` to turn them into nodes).
-- `D.union([{nodes, edges, dx, dy, s}, …])` → `[nodes, edges]` for side-by-side panels (spread into `D.svg(...)`).
-- `D.bars(values, {col, xl, yl})` → histogram SVG string (pass as `over` with empty nodes).
-- `D.t(x, y, text, cls)` captions; in `deck.js` the helper `cap(text, y)` centres a caption at x=100.
-- `D.op(v)` maps an opinion in [0,1] to a blue→orange colour; `D.frame(inner, alt)` wraps raw SVG.
+Create `diagrams/<card id>.tex` containing only a `tikzpicture` with the `card` style:
+```latex
+\begin{tikzpicture}[card]
+  \node[f, r=11] (c) at (100,66) {$k{=}5$};
+  \foreach \i in {0,...,4} {
+    \node[v] (n\i) at ([shift={(100,66)}] {-90+72*\i}:46) {};
+    \draw[hl] (c) -- (n\i);
+  }
+  \node[note] at (100,130) {how many ties does this node have?};
+\end{tikzpicture}
+```
+- **Canvas:** 200 × 140 units, origin top left, **y points down**. Polar coordinates around a centre: `([shift={(cx,cy)}] angle:radius)`; angle −90 is straight up.
+- **Nodes:** `v` open (default), `f` filled (the node the card is about, active/infected/adopting, or group 1), `sq` square (a third category), `gone` dashed (removed), `op=NN` grey fill for an opinion value 0–100. Size with `r=<radius>` (default 6). Labels inside nodes are `\tiny`; use `font=\scriptsize` for letters like `$A$`.
+- **Ties:** plain `\draw`, `hl` (the tie the card is about), `strong`, `weak` (dashed), `absent` (dotted: missing or potential), `neg` (negative sign), arrows with `->`.
+- **Text:** `note` for captions (`\scriptsize`), `sign` for $+$/$-$ labels, `axis`, `bar` for histograms.
+- **Grey only when it carries meaning** (an opinion value, a tie weight, a shaded interval such as `\fill[black!12]`). Never for decoration. No colours at all: the build rejects them.
+- Keep it simple: a handful of nodes, one idea, a short caption. The caption on a concept's front must not give away the definition.
+- TikZ gotchas: no commas inside a coordinate expression (precompute with `\pgfmathsetmacro`); brace the body of a `\foreach` that calls a macro; `cap` is a TikZ key (use `note`).
 
-Keep diagrams simple: a handful of nodes, one highlighted idea, a short caption. They are decoration, not the question. A card without `vis` is fine.
+Build and preview:
+```bash
+node build-diagrams.js          # only changed diagrams; --all to rebuild everything; or list ids
+```
+To eyeball diagrams in light and dark, serve the folder and open `diagrams/build/preview.html` (git-ignored scratch page), or just the Browse tab.
 
 ## Validate
 
-Run from the project folder (checks every card renders, ids are unique, `ref`s resolve):
 ```bash
-node -e "global.window={};const fs=require('fs');eval(fs.readFileSync('diagrams.js','utf8')+';global.D=D');eval(fs.readFileSync('deck.js','utf8')+';global.DECK=DECK');eval(fs.readFileSync('props.js','utf8'));const ids=DECK.map(c=>c.id);console.log(DECK.length,'cards');console.log('dupes',ids.filter((x,i)=>ids.indexOf(x)!==i));console.log('bad ref',DECK.filter(c=>c.type==='prop'&&!DECK.some(d=>d.id===c.ref)).map(c=>c.id));DECK.forEach(c=>{if(c.vis){const s=c.vis();if(/NaN|undefined/.test(s))console.log('BAD svg',c.id)}})"
+node check.js
 ```
-Expected: no dupes, no bad refs, no BAD svg. (`props.js` uses `const PROPS` and `DECK.push`; if eval complains about redeclaration, it ran twice.)
+Expected: 0 errors. It reports duplicate ids, unresolved `ref`s, LaTeX that KaTeX cannot parse, diagram files without a card, colours in compiled diagrams, a stale `diagrams.js` (run the build), and warns about concepts without a diagram or colour words in card text.
+
+## Procedure
+
+1. Grep ids to avoid duplicates (`Grep "id: 'candidate'"`).
+2. Concept = a *named thing* with a definition; proposition = a *claim* with an argument. The front must make the learner **produce** the answer, so it must not leak it.
+3. Write correct, concise text; for propositions give the actual reasoning and cite the source. Flag anything uncertain instead of inventing a citation or number.
+4. Add the entry with the Edit tool (not shell heredocs).
+5. Optional diagram: write `diagrams/<id>.tex`, run `node build-diagrams.js`.
+6. Run `node check.js`, then look at the card in the browser (light and dark).
 
 ## After adding
 
-Tell the user how many cards were added, to which topic, and which facts or citations deserve a double-check. Existing progress is unaffected because it is keyed by id. New cards appear as new cards in the next study session (default limit 10 new per session).
+Tell the user how many cards were added, to which topic, and which facts or citations deserve a double-check. Existing progress is unaffected. New cards appear as new cards in the next study session (default limit 10 new per session).
