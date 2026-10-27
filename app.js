@@ -68,7 +68,7 @@
   function renderStudy() {
     if (!queue.length) {
       const due = pool().filter(c => S.cards[c.id] && S.cards[c.id].reps > 0).map(c => S.cards[c.id].due).sort((a, b) => a - b)[0];
-      view.innerHTML = `<div class="center"><h2>🎉 All caught up</h2><p class="def">No cards due${S.settings.topic === 'All' ? '' : ' in ' + S.settings.topic}.${due ? ' Next review: ' + new Date(due).toLocaleString() + '.' : ''}</p>
+      view.innerHTML = `<div class="center"><h2>All caught up.</h2><p class="def">No cards due${S.settings.topic === 'All' ? '' : ' in ' + S.settings.topic}.${due ? ' Next review: ' + new Date(due).toLocaleString() + '.' : ''}</p>
         <div class="row" style="justify-content:center"><button class="btn primary" id="new">Start new session</button><button class="btn" id="cram">Cram everything</button></div></div>`;
       $('#new').onclick = () => { queue = buildQueue(); flipped = false; render(); };
       $('#cram').onclick = () => { queue = buildQueue(true); flipped = false; render(); };
@@ -76,16 +76,23 @@
     }
     const c = queue[0], fwd = S.settings.mode === 'forward', spark = S.settings.fvis;
     const vis = visOf(c), chip = `<span class="chip">${c.topic}</span>`;
+    /* typeset like a LaTeX document: Proposition / Proof sketch / Definition / Remark */
+    const fig = spark && vis ? `<div class="vis small">${vis}</div>` : '';
+    const formula = c.formula ? `<div class="formula">${tx(c, 'formula')}</div>` : '';
+    const prop = `<span class="thm-h">Proposition.</span> <span class="thm-b">${tx(c, 'name')}</span>`;
+    const defn = `<p class="def"><span class="thm-h">Definition.</span> ${tx(c, 'def')}</p>`;
+    const remark = `<p class="tip"><span class="rem-h">Remark.</span> ${tx(c, 'tip')}</p>`;
+    const hint = '<p class="hint">space = flip</p>';
     let front, back;
     if (isProp(c)) {
-      front = `${chip}<div class="claim">${tx(c, 'name')}</div><p class="prompt">Why is this true? Reconstruct the argument.</p><p class="hint">Space = flip</p>`;
-      back = `${chip}<p class="claimsm">${tx(c, 'name')}</p><div class="argument">${tx(c, 'def')}</div><p class="src">${tx(c, 'src')}</p>${spark && vis ? `<div class="vis small">${vis}</div>` : ''}`;
+      front = `${chip}<div class="mid"><div class="thm">${prop}</div></div><p class="prompt">Why is this true? Reconstruct the argument.</p>${hint}`;
+      back = `${chip}<p class="thm small">${prop}</p><div class="proof"><span class="proof-h">Proof sketch.</span> ${tx(c, 'def')}<span class="qed" aria-hidden="true">□</span></div><p class="src">${tx(c, 'src')}</p>${fig}`;
     } else if (fwd) {
-      front = `${chip}<div class="big-name">${tx(c, 'name')}</div>${spark && vis ? `<div class="vis small">${vis}</div>` : ''}<p class="prompt">Define it in your own words.</p><p class="hint">Space = flip</p>`;
-      back = `${chip}<h2>${tx(c, 'name')}</h2><p class="def">${tx(c, 'def')}</p>${c.formula ? `<div class="formula">${tx(c, 'formula')}</div>` : ''}<p class="tip">${tx(c, 'tip')}</p>${spark && vis ? `<div class="vis small">${vis}</div>` : ''}`;
+      front = `${chip}<div class="mid"><h1 class="big-name">${tx(c, 'name')}</h1>${fig}</div><p class="prompt">Define it in your own words.</p>${hint}`;
+      back = `${chip}<h2>${tx(c, 'name')}</h2>${defn}${formula}${remark}${fig}`;
     } else {
-      front = `${chip}<div class="claim">${tx(c, 'def')}</div>${c.formula ? `<div class="formula">${tx(c, 'formula')}</div>` : ''}<p class="prompt">Which concept is this?</p><p class="hint">Space = flip</p>`;
-      back = `${chip}<h2>${tx(c, 'name')}</h2><p class="tip">${tx(c, 'tip')}</p>${spark && vis ? `<div class="vis small">${vis}</div>` : ''}`;
+      front = `${chip}<div class="mid">${defn}${formula}</div><p class="prompt">Which concept is this?</p>${hint}`;
+      back = `${chip}<h2>${tx(c, 'name')}</h2>${remark}${fig}`;
     }
     const st = S.cards[c.id];
     view.innerHTML = `<div class="meta"><span>${queue.length} left in session</span><span>${st && st.reps ? 'reviewed ' + st.reps + '×' : 'new card'}</span></div>
@@ -128,10 +135,10 @@
     if (!quizState) newQuiz();
     if (!quizState) { view.innerHTML = '<p class="center">Quiz needs at least 4 concept cards in this selection.</p>'; return; }
     const { c, opts, picked, vis } = quizState;
-    view.innerHTML = `<div class="quiz-vis"><p class="claim" style="font-size:1.05rem">${tx(c, 'def')}</p>${vis}</div><div class="opts">${opts.map((o, i) => {
+    view.innerHTML = `<div class="quiz-vis"><p class="def"><span class="thm-h">Definition.</span> ${tx(c, 'def')}</p>${vis}</div><div class="opts">${opts.map((o, i) => {
       const cls = picked == null ? '' : o.id === c.id ? 'ok' : o.id === picked ? 'bad' : '';
       return `<button class="${cls}" data-id="${o.id}" ${picked != null ? 'disabled' : ''}><kbd>${i + 1}</kbd>${tx(o, 'name')}</button>`;
-    }).join('')}</div>${picked != null ? `<div class="reveal"><b>${tx(c, 'name')}</b> (${c.topic})${c.formula ? `<div class="formula">${tx(c, 'formula')}</div>` : ''}<p class="tip" style="text-align:left">${tx(c, 'tip')}</p><button class="btn primary" id="nq">Next →</button></div>` : ''}`;
+    }).join('')}</div>${picked != null ? `<div class="reveal"><b>${tx(c, 'name')}</b> <span class="sc">(${c.topic})</span>${c.formula ? `<div class="formula">${tx(c, 'formula')}</div>` : ''}<p class="tip"><span class="rem-h">Remark.</span> ${tx(c, 'tip')}</p><button class="btn primary" id="nq">Next →</button></div>` : ''}`;
     view.querySelectorAll('.opts button').forEach(b => b.onclick = () => pick(b.dataset.id));
     const n = $('#nq'); if (n) n.onclick = () => { newQuiz(); render(); };
   }

@@ -91,7 +91,7 @@ The header has four tabs: **Study**, **Quiz**, **Browse**, **Stats**. The active
 
 Back diagrams appear only when diagrams are on. The front must never leak the answer: no definition in a forward front's diagram caption, no conclusion in a proposition prompt.
 
-Both faces are typeset like a LaTeX page (§6): topic as a small-caps label top left, name or claim centred as a title, definition and argument as justified body text, formula as centred display math, tip set off as an italic remark, source in small type, prompt in italics.
+Both faces are typeset like a LaTeX page (§6): topic as a small-caps label top left, concept name centred as a title, a claim set as a theorem (**Proposition.** *claim*), the argument as *Proof sketch.* … □, a definition as **Definition.** …, formula as centred display, tip as *Remark.* …, source in small type after an em dash, prompt in italics. Body text is justified on wide screens and left-aligned on phones.
 
 ### 4.3 Quiz
 
