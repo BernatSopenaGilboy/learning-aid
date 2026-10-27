@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Network &amp; Society Flashcards</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header>
+  <h1>🕸️ Network &amp; Society Flashcards</h1>
+  <nav id="tabs">
+    <button data-view="study">Study</button>
+    <button data-view="quiz">Quiz</button>
+    <button data-view="browse">Browse</button>
+    <button data-view="stats">Stats</button>
+  </nav>
+  <div class="ctl">
+    <select id="topic" aria-label="Topic"></select>
+    <select id="kind" aria-label="Card kind">
+      <option value="All">Concepts + propositions</option>
+      <option value="concept">Concepts only</option>
+      <option value="prop">Propositions only</option>
+    </select>
+    <select id="mode" aria-label="Concept card direction">
+      <option value="forward">Concept → definition</option>
+      <option value="reverse">Definition → concept</option>
+    </select>
+    <label class="chk"><input type="checkbox" id="fvis"> diagrams</label>
+    <button id="theme" title="Toggle theme">◐</button>
+  </div>
+</header>
+<main id="view"></main>
+<script src="diagrams.js"></script>
+<script src="deck.js"></script>
+<script src="props.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
