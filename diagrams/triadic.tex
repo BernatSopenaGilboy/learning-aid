@@ -1,0 +1,8 @@
+\begin{tikzpicture}[card]
+  \node[f, r=10, font=\scriptsize] (A) at (100,28) {$A$};
+  \node[v, r=10, font=\scriptsize] (B) at (48,98) {$B$};
+  \node[v, r=10, font=\scriptsize] (C) at (152,98) {$C$};
+  \draw (A) -- (B) (A) -- (C);
+  \draw[absent, line width=0.8pt] (B) -- node[above, font=\scriptsize] {?} (C);
+  \node[note] at (100,130) {friends of friends become friends};
+\end{tikzpicture}

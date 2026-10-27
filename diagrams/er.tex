@@ -1,0 +1,5 @@
+\begin{tikzpicture}[card]
+  \foreach \i in {0,...,9} \node[v] (n\i) at ([shift={(100,64)}] {-90+36*\i}:48) {};
+  \foreach \a/\b in {0/3,0/7,1/4,1/8,2/5,2/9,3/6,4/9,5/8,6/0,7/2,1/6,3/8} \draw (n\a) -- (n\b);
+  \node[note] at (100,130) {every pair linked with probability $p$};
+\end{tikzpicture}

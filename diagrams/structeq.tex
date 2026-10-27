@@ -1,0 +1,9 @@
+\begin{tikzpicture}[card]
+  \node[f, r=10, font=\scriptsize] (u) at (36,66) {$u$};
+  \node[f, r=10, font=\scriptsize] (w) at (164,66) {$v$};
+  \foreach \y [count=\i] in {22,66,110} {
+    \node[v] (n\i) at (100,\y) {};
+    \draw (u) -- (n\i) -- (w);
+  }
+  \node[note] at (100,133) {same neighbours $\Rightarrow$ same position};
+\end{tikzpicture}

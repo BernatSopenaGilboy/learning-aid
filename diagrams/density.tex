@@ -1,0 +1,6 @@
+\begin{tikzpicture}[card]
+  \foreach \i in {0,...,5} \node[v] (n\i) at ([shift={(100,64)}] {-90+60*\i}:48) {};
+  \foreach \a/\b in {0/1,1/2,2/3,3/4,4/5,5/0,0/3,1/4} \draw (n\a) -- (n\b);
+  \foreach \a/\b in {0/2,0/4,1/3,1/5,2/4,2/5,3/5} \draw[absent] (n\a) -- (n\b);
+  \node[note] at (100,130) {8 of 15 possible ties};
+\end{tikzpicture}

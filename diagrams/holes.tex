@@ -1,0 +1,17 @@
+\begin{tikzpicture}[card]
+  \node[f, r=8] (L) at (44,62) {};
+  \foreach \i in {0,...,2} {
+    \node[v] (l\i) at ([shift={(44,62)}] {-90+120*\i}:34) {};
+    \draw (L) -- (l\i);
+  }
+  \draw (l0) -- (l1) -- (l2) -- (l0);           % contacts know each other
+  \node[f, r=8] (R) at (156,62) {};
+  \foreach \i in {0,...,2} {
+    \node[v] (r\i) at ([shift={(156,62)}] {-90+120*\i}:34) {};
+    \draw[hl] (R) -- (r\i);
+  }
+  \draw[absent] (r0) -- (r1) -- (r2) -- (r0);   % the structural holes
+  \draw[axis] (100,14) -- (100,108);
+  \node[note] at (44,124) {redundant};
+  \node[note] at (156,124) {holes $\Rightarrow$ broker};
+\end{tikzpicture}

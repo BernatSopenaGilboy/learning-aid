@@ -1,0 +1,9 @@
+\begin{tikzpicture}[card]
+  \node[f] (a1) at (30,66) {};  \node[f] (a2) at (70,66) {};
+  \node[f] (b1) at (130,66) {}; \node[f] (b2) at (170,66) {};
+  \draw[weak] (a1) -- node[above, font=\scriptsize] {$w_{ij}$} (a2);
+  \draw[strong] (b1) -- node[above, font=\scriptsize] {$w_{ij}$} (b2);
+  \draw[->] (90,66) -- (110,66);
+  \node[note] at (50,92) {before};
+  \node[note] at (150,92) {after};
+\end{tikzpicture}

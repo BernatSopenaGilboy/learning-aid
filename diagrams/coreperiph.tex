@@ -1,0 +1,12 @@
+\begin{tikzpicture}[card]
+  \foreach \i in {0,...,4} \node[f] (c\i) at ([shift={(100,66)}] {-90+72*\i}:20) {};
+  \foreach \i in {0,...,3} {
+    \pgfmathtruncatemacro\s{\i+1}
+    \foreach \j in {\s,...,4} \draw (c\i) -- (c\j);
+  }
+  \foreach \i in {0,...,7} {
+    \pgfmathtruncatemacro\t{mod(round(\i*5/8),5)}
+    \node[v, r=4.5] (p\i) at ([shift={(100,66)}] {-90+45*\i}:56) {};
+    \draw (p\i) -- (c\t);
+  }
+\end{tikzpicture}

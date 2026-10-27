@@ -1,0 +1,12 @@
+\begin{tikzpicture}[card]
+  \node[f, r=9] (c) at (100,66) {};
+  \foreach \i in {1,...,4} {
+    \node[v] (n\i) at ([shift={(100,66)}] {-135+90*\i}:44) {};
+    \draw (c) -- (n\i);
+  }
+  \draw[hl] (n1) -- (n2) (n3) -- (n4);          % the 2 linked neighbour pairs
+  \begin{pgfonlayer}{background}               % the 4 missing pairs
+    \draw[absent] (n2) -- (n3) (n4) -- (n1) (n1) -- (n3) (n2) -- (n4);
+  \end{pgfonlayer}
+  \node[note] at (100,130) {$C = 2/6 = 1/3$};
+\end{tikzpicture}

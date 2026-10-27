@@ -1,0 +1,14 @@
+\begin{tikzpicture}[card]
+  \node[f, r=12] (h1) at (58,66) {};
+  \node[f, r=9] (h2) at (150,66) {};
+  \foreach \i in {0,...,7} {
+    \node[v, r=4.5] (a\i) at ([shift={(58,66)}] {200+45*\i}:40) {};
+    \draw (h1) -- (a\i);
+  }
+  \foreach \i in {0,...,4} {
+    \node[v, r=4.5] (b\i) at ([shift={(152,66)}] {-90+72*\i}:30) {};
+    \draw (h2) -- (b\i);
+  }
+  \draw[hl] (h1) -- (h2);
+  \node[note] at (100,130) {few hubs, many small nodes};
+\end{tikzpicture}

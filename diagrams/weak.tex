@@ -1,0 +1,7 @@
+\begin{tikzpicture}[card]
+  \node[v] (a1) at (28,46) {};  \node[v] (a2) at (28,100) {};  \node[v] (a3) at (70,73) {};
+  \node[v] (b1) at (130,73) {}; \node[v] (b2) at (172,46) {}; \node[v] (b3) at (172,100) {};
+  \draw[strong] (a1) -- (a2) -- (a3) -- (a1) (b1) -- (b2) -- (b3) -- (b1);
+  \draw[weak] (a3) -- (b1);
+  \node[note] at (100,130) {weak tie = bridge to new information};
+\end{tikzpicture}

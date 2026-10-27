@@ -1,0 +1,10 @@
+\begin{tikzpicture}[card]
+  \foreach \i in {0,...,4} \node[f] (k\i) at ([shift={(65,68)}] {-90+72*\i}:38) {};
+  \foreach \i in {0,...,3} {
+    \pgfmathtruncatemacro\s{\i+1}
+    \foreach \j in {\s,...,4} \draw (k\i) -- (k\j);
+  }
+  \node[v] (x) at (140,36) {}; \node[v] (y) at (165,100) {}; \node[v] (z) at (180,56) {};
+  \draw (k1) -- (x) -- (z) (k2) -- (y);
+  \node[note] at (100,132) {every pair connected};
+\end{tikzpicture}

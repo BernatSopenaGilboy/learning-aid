@@ -1,0 +1,8 @@
+\begin{tikzpicture}[card]
+  \foreach \x/\y [count=\i] in {30/40, 66/26, 60/72, 102/52, 96/98, 135/74} \node[f] (g\i) at (\x,\y) {};
+  \draw (g1) -- (g2) -- (g3) -- (g1) (g2) -- (g4) -- (g5) -- (g3) (g4) -- (g6);
+  \node[v] (i1) at (165,28) {}; \node[v] (i2) at (184,58) {};
+  \draw (i1) -- (i2);
+  \node[v] at (160,112) {};
+  \node[note] at (100,132) {a giant component, an island, an isolate};
+\end{tikzpicture}

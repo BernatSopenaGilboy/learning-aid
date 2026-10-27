@@ -1,0 +1,14 @@
+\begin{tikzpicture}[card]
+  \node[f, r=12] (h) at (125,66) {};
+  \foreach \i in {0,...,5} {
+    \node[v, r=4.5] (l\i) at ([shift={(125,66)}] {-90+60*\i}:40) {};
+    \draw (h) -- (l\i);
+  }
+  \node[v] (new) at (24,66) {};
+  \node[note, above] at (new.north) {new};
+  % candidate links; thickness = probability of being chosen
+  \draw[->, weak, line width=1.1pt] (new) -- (h);
+  \draw[->, weak] (new) -- (l2);
+  \draw[->, weak] (new) -- (l5);
+  \node[note] at (100,130) {the new node picks popular nodes};
+\end{tikzpicture}

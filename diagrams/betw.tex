@@ -1,0 +1,10 @@
+\begin{tikzpicture}[card]
+  \node[v] (a) at (25,45) {};  \node[v] (b) at (25,95) {};
+  \node[v, r=8] (lb) at (66,70) {};
+  \node[f, r=11] (m) at (100,70) {};
+  \node[v, r=8] (rb) at (134,70) {};
+  \node[v] (c) at (175,45) {}; \node[v] (d) at (175,95) {};
+  \draw (a) -- (b) -- (lb) -- (a) (rb) -- (c) -- (d) -- (rb);
+  \draw[hl] (lb) -- (m) -- (rb);
+  \node[note] at (100,130) {lies on many shortest paths};
+\end{tikzpicture}

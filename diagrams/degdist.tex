@@ -1,0 +1,8 @@
+\begin{tikzpicture}[card]
+  \draw[axis, ->] (24,112) -- (194,112);
+  \draw[axis, ->] (24,112) -- (24,18);
+  \foreach \h [count=\i from 0] in {62,30,16,9,5,3,2,1,1,1}
+    \draw[bar] ({28+16*\i},112) rectangle ++(13,{-80*\h/62});
+  \node[note] at (108,126) {degree $k$};
+  \node[note, rotate=90] at (13,66) {$P(k)$};
+\end{tikzpicture}

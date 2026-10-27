@@ -1,4 +1,5 @@
 :root{
+  --ink:var(--text);--paper:var(--panel);
   --bg:#f6f7fb;--panel:#fff;--text:#1d2433;--muted:#69728a;--line:#dde1ec;--accent:#3b6fe0;
   --n:#9aa3b8;--a:#3b82f6;--b:#ef5b5b;--c:#2bb673;--d:#f5a524;--e:#8b5cf6;
   --edge:#8a93aa;--hl:#e8590c;--shadow:0 6px 24px rgba(30,40,80,.12);
@@ -77,31 +78,6 @@ main{max-width:860px;margin:0 auto;padding:20px 16px 60px}
 .prog .bar i{display:block;height:100%;background:var(--c)}
 .row{display:flex;gap:10px;flex-wrap:wrap;margin-top:18px}
 
-/* svg bits */
-.node{stroke:var(--panel);stroke-width:1.5}
-.c-n{fill:var(--n)}.c-a{fill:var(--a)}.c-b{fill:var(--b)}.c-c{fill:var(--c)}.c-d{fill:var(--d)}.c-e{fill:var(--e)}
-.edge{stroke:var(--edge);stroke-width:1.6;fill:none}
-.edge.hl{stroke:var(--hl);stroke-width:3}
-.edge.dash{stroke-dasharray:5 4}
-.edge.ghost{stroke-dasharray:2 4;opacity:.4;stroke-width:1.2}
-.edge.pos{stroke:var(--c);stroke-width:2.6}
-.edge.neg{stroke:var(--b);stroke-dasharray:5 4;stroke-width:2.6}
-.edge.amb{stroke:var(--d)}
-.edge.thick{stroke-width:4.5}.edge.thin{stroke-width:1}
-.arrowhead{fill:var(--edge);fill:context-stroke}
-.lbl{font-weight:600;fill:#fff;text-anchor:middle;dominant-baseline:central;font-family:system-ui,sans-serif;pointer-events:none}
-.cap{font:11px system-ui,sans-serif;fill:var(--muted);text-anchor:middle}
-.cap.ok{fill:var(--c);font-weight:600}.cap.bad{fill:var(--b);font-weight:600}
-.big{font:22px system-ui;fill:var(--muted);text-anchor:middle}
-.x{font:34px system-ui;fill:var(--b);text-anchor:middle;dominant-baseline:central}
-.axis{stroke:var(--muted);stroke-width:1}
-.ring{fill:none;stroke:var(--muted);stroke-width:1;stroke-dasharray:3 4;opacity:.7}.ring.solid{stroke-dasharray:none;stroke:var(--a);stroke-width:2;opacity:.8}
-.bar.b-a{fill:var(--a)}.bar.b-b{fill:var(--b)}.bar.b-n{fill:var(--n)}
-.band{fill:var(--a);opacity:.15}
-.venn{stroke-width:2}
-.v1{fill:var(--a);stroke:var(--a);fill-opacity:.2}.v2{fill:var(--b);stroke:var(--b);fill-opacity:.2}.v3{fill:var(--c);stroke:var(--c);fill-opacity:.2}
-.cell.c-a{fill:var(--a)}.cell.c-b{fill:var(--b)}.cell.empty{fill:none;stroke:var(--line)}
-.cell.unhappy{stroke:var(--text);stroke-width:2}
 @media(prefers-reduced-motion:reduce){.card{transition:none}}
 
 /* proposition / reverse cards */

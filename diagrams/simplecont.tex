@@ -1,0 +1,9 @@
+\begin{tikzpicture}[card]
+  \node[f] (a) at (28,66) {};  \node[f] (b) at (75,34) {};    % infected
+  \node[v] (c) at (75,100) {}; \node[v] (d) at (125,34) {};
+  \node[v] (e) at (125,100) {}; \node[v] (g) at (172,66) {};
+  \draw (a) -- (b) (c) -- (e) (d) -- (g) (e) -- (g);
+  \draw[hl, ->] (a) -- (c);
+  \draw[hl, ->] (b) -- (d);
+  \node[note] at (100,130) {one exposure can infect};
+\end{tikzpicture}

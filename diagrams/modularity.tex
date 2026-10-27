@@ -1,0 +1,18 @@
+\begin{tikzpicture}[card]
+  % the same graph twice: a good partition (left) and a random one (right)
+  \foreach \side/\dx/\styles in {L/2/{f,f,f,f,v,v,v,v}, R/102/{f,v,f,v,v,f,v,f}} {
+    \foreach \s [count=\i from 0] in \styles {
+      \pgfmathsetmacro\cx{\dx + (\i < 4 ? 25 : 75)}
+      \pgfmathsetmacro\ang{-90 + 90*mod(\i,4)}
+      \node[\s] (\side\i) at ([shift={(\cx,47)}] \ang:15) {};
+    }
+    \foreach \o in {0,4} {
+      \pgfmathtruncatemacro\ia{\o+1}\pgfmathtruncatemacro\ib{\o+2}\pgfmathtruncatemacro\ic{\o+3}
+      \draw (\side\o) -- (\side\ia) -- (\side\ib) -- (\side\ic) -- (\side\o) -- (\side\ib);
+    }
+    \draw (\side1) -- (\side7);
+  }
+  \draw[axis] (100,14) -- (100,106);
+  \node[note, align=center] at (52,90) {good split\\ high $Q$};
+  \node[note, align=center] at (152,90) {random split\\ $Q \approx 0$};
+\end{tikzpicture}

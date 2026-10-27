@@ -1,0 +1,8 @@
+\begin{tikzpicture}[card]
+  \node[v, r=17, font=\footnotesize] (S) at (35,62) {$S$};
+  \node[f, r=17, font=\footnotesize] (I) at (100,62) {$I$};
+  \node[gone, r=17, font=\footnotesize] (R) at (165,62) {$R$};
+  \draw[->] (S) -- node[above] {$\beta$} (I);
+  \draw[->] (I) -- node[above] {$\gamma$} (R);
+  \node[note] at (100,110) {infection rate $\beta$, recovery rate $\gamma$};
+\end{tikzpicture}

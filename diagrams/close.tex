@@ -1,0 +1,11 @@
+\begin{tikzpicture}[card]
+  \draw[weak] (100,66) circle[radius=28] (100,66) circle[radius=56];   % distance 1 and 2
+  \node[f, r=10] (c) at (100,66) {};
+  \foreach \x/\y [count=\i] in {100/38, 128/66, 100/94, 72/66} {
+    \node[v] (n\i) at (\x,\y) {};
+    \draw (c) -- (n\i);
+  }
+  \node[v] (n5) at (156,66) {};
+  \draw (n2) -- (n5);
+  \node[note] at (100,133) {short average distance to everyone};
+\end{tikzpicture}

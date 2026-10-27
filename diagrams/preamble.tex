@@ -1,0 +1,39 @@
+% Shared preamble for every card diagram (diagrams/<card id>.tex).
+% build-diagrams.js wraps each diagram in a standalone document that \input's this file.
+%
+% Canvas: the `card` style gives a fixed 200 x 140 box (5 cm x 3.5 cm), origin top left,
+% y pointing DOWN, so every diagram has the same scale and text size.
+% Polar coordinates work as usual: ([shift={(100,66)}] -90:46) is 46 units straight up.
+%
+% Design rules: ink and paper only. Grey (black!NN) only when it encodes a quantity
+% (opinion value, tie weight) or a region (confidence interval). Never for decoration.
+
+\usetikzlibrary{arrows.meta, backgrounds, shapes.geometric}
+
+\tikzset{
+  card/.style={
+    x=0.25mm, y=-0.25mm, line width=0.4pt, line cap=round, line join=round,
+    >={Latex[length=1.7mm, width=1.2mm]},
+    every node/.append style={font=\scriptsize},
+    execute at begin picture={\useasboundingbox (0,0) rectangle (200,140);}
+  },
+  % ── vertices ──  r=<radius in canvas units>, default 6
+  r/.style={minimum size=#1*0.5mm},
+  v/.style={circle, draw, fill=white, inner sep=0pt, line width=0.5pt,
+            minimum size=3mm, font=\tiny},                    % default: open
+  f/.style={v, fill=black, text=white},                      % emphasised / active / group 1
+  sq/.style={v, rectangle, minimum size=2.6mm},              % third category (shape, not grey)
+  gone/.style={v, fill=none, dash pattern=on 1.2pt off 1pt}, % removed node
+  op/.style={v, fill=black!#1},                              % opinion value as grey (0..100)
+  % ── ties ──
+  hl/.style={line width=1.2pt},                              % the tie the card is about
+  strong/.style={line width=1.4pt},
+  weak/.style={line width=0.4pt, dash pattern=on 2pt off 1.6pt},
+  absent/.style={line width=0.4pt, dash pattern=on 0pt off 1.6pt}, % missing / potential tie (dotted)
+  neg/.style={dash pattern=on 2.4pt off 1.6pt},              % negative signed tie
+  % ── annotation ──
+  note/.style={font=\scriptsize},
+  sign/.style={font=\tiny, inner sep=1pt},
+  axis/.style={line width=0.4pt},
+  bar/.style={draw, fill=white, line width=0.4pt},
+}

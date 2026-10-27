@@ -1,0 +1,13 @@
+\begin{tikzpicture}[card]
+  \node[f, r=10] (e) at (100,66) {};
+  % bonding: a dense cluster of similar others
+  \foreach \x/\y [count=\i] in {48/34, 30/78, 60/108} \node[f] (b\i) at (\x,\y) {};
+  \draw (e) -- (b1) (e) -- (b2) (e) -- (b3) (b1) -- (b2) -- (b3) -- (b1);
+  % bridging: ties out to other groups
+  \node[v] (r1) at (152,38) {}; \node[v] (r2) at (160,100) {};
+  \draw[hl] (e) -- (r1) (e) -- (r2);
+  \foreach \x/\y [count=\i] in {185/20, 186/66, 186/118} \node[v] (o\i) at (\x,\y) {};
+  \draw (r1) -- (o1) (r1) -- (o2) (r2) -- (o3);
+  \node[note] at (46,130) {bonding};
+  \node[note] at (156,132) {bridging};
+\end{tikzpicture}

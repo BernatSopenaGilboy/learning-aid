@@ -1,0 +1,13 @@
+\begin{tikzpicture}[card]
+  \draw (100,66) circle[radius=38];             % the bubble
+  \node[f, r=9] (c) at (100,66) {};
+  \foreach \i in {0,...,3} {
+    \node[f] (i\i) at ([shift={(100,66)}] {-45+90*\i}:26) {};
+    \draw (c) -- (i\i);
+  }
+  \foreach \i in {0,...,6} \node[gone] (o\i) at ([shift={(100,66)}] {-80+360/7*\i}:56) {};
+  \begin{pgfonlayer}{background}
+    \foreach \i in {0,...,6} \draw[absent] (c) -- (o\i);
+  \end{pgfonlayer}
+  \node[note] at (100,134) {personalised feed = bubble};
+\end{tikzpicture}

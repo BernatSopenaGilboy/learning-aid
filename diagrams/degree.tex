@@ -1,0 +1,8 @@
+\begin{tikzpicture}[card]
+  \node[f, r=11] (c) at (100,66) {$k{=}5$};
+  \foreach \i in {0,...,4} {
+    \node[v] (n\i) at ([shift={(100,66)}] {-90+72*\i}:46) {};
+    \draw[hl] (c) -- (n\i);
+  }
+  \node[note] at (100,132) {how many ties does this node have?};
+\end{tikzpicture}

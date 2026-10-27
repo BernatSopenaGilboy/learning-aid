@@ -1,0 +1,12 @@
+\begin{tikzpicture}[card]
+  % ring = innate opinion x(0), fill = opinion after talking (grey level = opinion value)
+  \foreach \before/\after [count=\i from 0] in {5/20, 90/75, 30/35, 70/60, 50/50} {
+    \node[circle, inner sep=0pt, minimum size=5.5mm, fill=black!\after,
+          draw=black, line width=0.3pt, double=black!\before, double distance=1.8pt]
+      (n\i) at ([shift={(100,62)}] {-90+72*\i}:40) {};
+  }
+  \begin{pgfonlayer}{background}
+    \draw (n0) -- (n1) -- (n2) -- (n3) -- (n4) -- (n0) -- (n2);
+  \end{pgfonlayer}
+  \node[note] at (100,130) {ring = own belief, fill = after talking};
+\end{tikzpicture}

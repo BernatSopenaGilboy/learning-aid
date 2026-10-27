@@ -1,0 +1,7 @@
+\begin{tikzpicture}[card]
+  \node[v, r=12, font=\scriptsize] (c) at (100,66) {?};
+  \foreach \s [count=\i from 0] in {f,f,f,v} \node[\s, r=8] (n\i) at ([shift={(100,66)}] {-45+90*\i}:50) {};
+  \draw[hl, ->] (n0) -- (c);
+  \draw (n1) -- (c) (n2) -- (c) (n3) -- (c);
+  \node[note] at (100,130) {copy a random neighbour};
+\end{tikzpicture}

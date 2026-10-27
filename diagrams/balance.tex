@@ -1,0 +1,20 @@
+\begin{tikzpicture}[card]
+  % three signed triangles: solid = positive, dashed = negative
+  \foreach \cx [count=\k] in {36,100,164} {
+    \node[v] (t\k-a) at (\cx,28) {};
+    \node[v] (t\k-b) at ({\cx-24},84) {};
+    \node[v] (t\k-c) at ({\cx+24},84) {};
+  }
+  \draw      (t1-a) -- node[sign, left]  {$+$} (t1-b);
+  \draw      (t1-b) -- node[sign, below] {$+$} (t1-c);
+  \draw      (t1-c) -- node[sign, right] {$+$} (t1-a);
+  \draw      (t2-a) -- node[sign, left]  {$+$} (t2-b);
+  \draw[neg] (t2-b) -- node[sign, below] {$-$} (t2-c);
+  \draw[neg] (t2-c) -- node[sign, right] {$-$} (t2-a);
+  \draw      (t3-a) -- node[sign, left]  {$+$} (t3-b);
+  \draw      (t3-b) -- node[sign, below] {$+$} (t3-c);
+  \draw[neg] (t3-c) -- node[sign, right] {$-$} (t3-a);
+  \node[note] at (36,118) {balanced};
+  \node[note] at (100,118) {balanced};
+  \node[note] at (164,118) {unbalanced};
+\end{tikzpicture}

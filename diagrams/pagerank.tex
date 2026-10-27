@@ -1,0 +1,11 @@
+\begin{tikzpicture}[card]
+  \node[f, r=13] (c) at (100,66) {};
+  \node[f, r=9] (d) at (155,100) {};
+  \foreach \x/\y [count=\i] in {38/26, 45/100, 38/66, 150/26} {
+    \node[v] (n\i) at (\x,\y) {};
+    \draw[->] (n\i) -- (c);
+  }
+  \draw[->, hl] (c) -- (d);
+  \draw[->] (d) -- (n2);
+  \node[note] at (100,130) {importance flows along links};
+\end{tikzpicture}

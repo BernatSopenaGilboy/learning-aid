@@ -1,0 +1,7 @@
+\begin{tikzpicture}[card]
+  \foreach \x/\y [count=\i] in {40/38, 88/28, 66/78} \node[f, r=10] (h\i) at (\x,\y) {};
+  \foreach \x/\y [count=\i] in {125/105, 152/82, 178/112, 168/46, 128/52} \node[v, r=5] (s\i) at (\x,\y) {};
+  \draw (h1) -- (h2) -- (h3) -- (h1);
+  \draw (s1) -- (s2) -- (s3) -- (s1) (s2) -- (s4) -- (s5);
+  \node[note] at (100,132) {like links to like ($r > 0$)};
+\end{tikzpicture}

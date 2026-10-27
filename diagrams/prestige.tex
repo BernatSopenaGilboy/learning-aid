@@ -1,0 +1,8 @@
+\begin{tikzpicture}[card]
+  \node[f, r=14] (c) at (100,66) {};
+  \foreach \i in {0,...,4} {
+    \node[v, r=5] (n\i) at ([shift={(100,66)}] {-90+72*\i}:52) {};
+    \draw[->] (n\i) -- (c);
+  }
+  \node[note] at (100,130) {chosen by many};
+\end{tikzpicture}

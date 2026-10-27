@@ -1,0 +1,15 @@
+\begin{tikzpicture}[card]
+  % the same star: intact (left) and with its hub removed (right)
+  \foreach \cx in {50,150} {
+    \foreach \i in {1,...,6} \node[v, r=3.2] (s\cx-\i) at ([shift={(\cx,66)}] {-150+60*\i}:25) {};
+    \draw (s\cx-1) -- (s\cx-2) (s\cx-3) -- (s\cx-4) (s\cx-5) -- (s\cx-6);
+  }
+  \node[f, r=6.2] (h50) at (50,66) {};
+  \node[gone, r=6.2] (h150) at (150,66) {};
+  \foreach \i in {1,...,6} {
+    \draw (h50) -- (s50-\i);
+    \draw[absent] (h150) -- (s150-\i);
+  }
+  \node[note] at (50,108) {intact};
+  \node[note, align=center] at (150,112) {hub removed\\ $\Rightarrow$ fragments};
+\end{tikzpicture}

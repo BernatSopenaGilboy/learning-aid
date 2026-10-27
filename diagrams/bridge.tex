@@ -1,0 +1,7 @@
+\begin{tikzpicture}[card]
+  \node[v] (a1) at (30,45) {};  \node[v] (a2) at (30,95) {};  \node[v] (a3) at (72,70) {};
+  \node[v] (b1) at (128,70) {}; \node[v] (b2) at (170,45) {}; \node[v] (b3) at (170,95) {};
+  \draw (a1) -- (a2) -- (a3) -- (a1) (b1) -- (b2) -- (b3) -- (b1);
+  \draw[hl] (a3) -- (b1);
+  \node[note] at (100,130) {cut this tie $\Rightarrow$ two components};
+\end{tikzpicture}

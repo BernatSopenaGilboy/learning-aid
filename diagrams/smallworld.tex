@@ -1,0 +1,9 @@
+\begin{tikzpicture}[card]
+  \foreach \i in {0,...,11} \node[v] (n\i) at ([shift={(100,64)}] {-90+30*\i}:48) {};
+  \foreach \i in {0,...,11} {
+    \pgfmathtruncatemacro\ja{mod(\i+1,12)}\pgfmathtruncatemacro\jb{mod(\i+2,12)}
+    \draw (n\i) -- (n\ja) (n\i) -- (n\jb);
+  }
+  \draw[hl] (n0) -- (n6) (n3) -- (n9);          % shortcuts
+  \node[note] at (100,130) {local ties + a few shortcuts};
+\end{tikzpicture}

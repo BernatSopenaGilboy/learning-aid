@@ -1,0 +1,9 @@
+\begin{tikzpicture}[card]
+  \node[f, r=12] (c) at (100,66) {};
+  \foreach \s [count=\i from 0] in {5,7,5,5,7} {
+    \node[v, r=\s] (n\i) at ([shift={(100,66)}] {-90+72*\i}:46) {};
+    \draw (c) -- (n\i);
+  }
+  \draw (n1) -- (n4);
+  \node[note] at (100,130) {size $\propto$ number of ties};
+\end{tikzpicture}

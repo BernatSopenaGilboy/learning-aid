@@ -1,0 +1,15 @@
+\begin{tikzpicture}[card]
+  % top: similar nodes form a tie (selection)
+  \node[f] (a1) at (24,34) {};  \node[f] (a2) at (76,34) {};
+  \node[f] (a3) at (124,34) {}; \node[f] (a4) at (176,34) {};
+  \draw[hl] (a3) -- (a4);
+  % bottom: tied nodes become similar (influence)
+  \node[f] (b1) at (24,94) {};  \node[v] (b2) at (76,94) {};
+  \node[f] (b3) at (124,94) {}; \node[f] (b4) at (176,94) {};
+  \draw (b1) -- (b2);
+  \draw[hl] (b3) -- (b4);
+  \draw[->] (90,34) -- (110,34);
+  \draw[->] (90,94) -- (110,94);
+  \node[note] at (100,54) {similar nodes tie up};
+  \node[note] at (100,114) {tied nodes converge};
+\end{tikzpicture}

@@ -1,0 +1,8 @@
+\begin{tikzpicture}[card]
+  \node[v, r=10, font=\scriptsize] (A) at (45,42) {$A$};
+  \node[v, r=10, font=\scriptsize] (B) at (155,42) {$B$};
+  \node[v, r=10, font=\scriptsize] (C) at (100,108) {$C$};
+  \draw[hl, <->] (A) -- node[above, note] {mutual} (B);
+  \draw[->] (B) -- (C);
+  \draw[->] (C) -- (A);
+\end{tikzpicture}

@@ -1,0 +1,9 @@
+\begin{tikzpicture}[card]
+  \node[f] (s) at (20,62) {$s$};
+  \node[f] (t) at (180,62) {$t$};
+  \node[v] (a) at (70,36) {};  \node[v] (b) at (125,36) {};
+  \node[v] (c) at (45,100) {}; \node[v] (d) at (100,112) {}; \node[v] (e) at (155,100) {};
+  \draw[hl] (s) -- (a) -- (b) -- (t);
+  \draw (s) -- (c) -- (d) -- (e) -- (t);
+  \node[note] at (100,132) {$d(s,t) = 3$};
+\end{tikzpicture}

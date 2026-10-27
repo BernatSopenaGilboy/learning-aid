@@ -1,0 +1,12 @@
+\begin{tikzpicture}[card]
+  \foreach \i in {0,...,4} {
+    \node[f, r=7] (a\i) at ([shift={(50,66)}] {-90+72*\i}:30) {};
+    \node[v, r=7] (b\i) at ([shift={(150,66)}] {-90+72*\i}:30) {};
+  }
+  \foreach \i in {0,...,3} {
+    \pgfmathtruncatemacro\s{\i+1}
+    \foreach \j in {\s,...,4} \draw (a\i) -- (a\j) (b\i) -- (b\j);
+  }
+  \draw[absent] (a1) -- node[fill=white, inner sep=0.6pt, font=\footnotesize] {$\times$} (b4);  % missing cross-link
+  \node[note] at (100,130) {no cross-cutting exposure};
+\end{tikzpicture}

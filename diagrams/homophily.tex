@@ -1,0 +1,7 @@
+\begin{tikzpicture}[card]
+  \foreach \s [count=\i from 0] in {f,v,f,f,v,v,f,v,v,f}
+    \node[\s, r=7] (n\i) at ([shift={(100,64)}] {-90+36*\i}:48) {};
+  \foreach \a/\b in {0/2,2/3,3/6,6/9,9/0,2/6,1/4,4/5,5/7,7/8,8/1,4/8} \draw (n\a) -- (n\b);
+  \draw[weak] (n3) -- (n4);                     % the one cross-group tie
+  \node[note] at (100,130) {ties mostly join similar nodes};
+\end{tikzpicture}

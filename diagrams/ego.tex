@@ -1,0 +1,9 @@
+\begin{tikzpicture}[card]
+  \node[f, r=10] (e) at (100,64) {ego};
+  \foreach \i in {1,...,6} {
+    \node[v] (a\i) at ([shift={(100,64)}] {-120+60*\i}:48) {};
+    \draw (e) -- (a\i);
+  }
+  \draw[hl] (a1) -- (a2) (a3) -- (a4) -- (a5);  % ties among alters
+  \node[note] at (100,130) {ego, alters, and ties among alters};
+\end{tikzpicture}

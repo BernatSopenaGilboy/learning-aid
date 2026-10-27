@@ -1,0 +1,9 @@
+\begin{tikzpicture}[card]
+  \draw[axis, ->] (24,112) -- (196,112);
+  \draw[axis, ->] (24,112) -- (24,18);
+  \foreach \h [count=\i from 0] in {3,10,16,9,2,1,2,9,17,12,4}
+    \draw[bar] ({28+15*\i},112) rectangle ++(12,{-80*\h/17});
+  \foreach \x/\t in {34/-1, 109/0, 184/+1} \node[note, below] at (\x,112) {$\t$};
+  \node[note] at (109,132) {opinion};
+  \node[note, rotate=90] at (13,66) {agents};
+\end{tikzpicture}

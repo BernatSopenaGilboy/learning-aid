@@ -38,7 +38,8 @@
 
   /* ── helpers ── */
   const isProp = c => c.type === 'prop';
-  const visOf = c => { const src = isProp(c) ? DECK.find(d => d.id === c.ref) : c; return src && src.vis ? src.vis() : ''; };
+  /* diagrams are compiled from diagrams/<id>.tex into diagrams.js; a proposition borrows its ref's diagram */
+  const visOf = c => (typeof DIAGRAMS !== 'undefined' && DIAGRAMS[isProp(c) ? c.ref : c.id]) || '';
   const pool = () => DECK.filter(c => (S.settings.topic === 'All' || c.topic === S.settings.topic) && (S.settings.kind === 'All' || (S.settings.kind === 'prop') === isProp(c)));
   const isDue = c => { const s = S.cards[c.id]; return s && s.reps > 0 && s.due <= Date.now(); };
   const isNew = c => !S.cards[c.id] || !S.cards[c.id].reps;
@@ -120,7 +121,7 @@
     const c = src[Math.random() * src.length | 0];
     const same = shuffle(DECK.filter(x => !isProp(x) && x.id !== c.id && x.topic === c.topic)), other = shuffle(DECK.filter(x => !isProp(x) && x.id !== c.id && x.topic !== c.topic));
     const opts = shuffle([c, ...[...same, ...other].slice(0, 3)]);
-    quizState = { c, opts, picked: null, vis: S.settings.fvis ? c.vis() : '' };
+    quizState = { c, opts, picked: null, vis: S.settings.fvis ? visOf(c) : '' };
   }
   function renderQuiz() {
     if (!quizState) newQuiz();

@@ -1,0 +1,16 @@
+\begin{tikzpicture}[card]
+  % grey level = opinion in [0,1] (white = 0, black = 1)
+  \def\opnode#1#2#3#4{% name, centre x, angle, opinion x 100
+    \pgfmathtruncatemacro\dark{#4>50}\ifnum\dark=1 \def\tc{white}\else\def\tc{black}\fi
+    \pgfmathsetmacro\lv{#4/100}
+    \node[op=#4, r=9, text=\tc] (#1) at ([shift={(#2,62)}] #3:32) {\pgfmathprintnumber[fixed,precision=1]{\lv}};}
+  \foreach \val [count=\i from 0] in {10,90,30,70,50} {
+    \pgfmathsetmacro\ang{-90+72*\i}
+    \opnode{a\i}{50}{\ang}{\val}
+    \opnode{b\i}{150}{\ang}{50}
+  }
+  \foreach \x/\y in {0/1,1/2,2/3,3/4,4/0,0/2} \draw (a\x) -- (a\y) (b\x) -- (b\y);
+  \draw[->] (90,62) -- (110,62);
+  \node[note] at (50,114) {start};
+  \node[note] at (150,114) {consensus};
+\end{tikzpicture}

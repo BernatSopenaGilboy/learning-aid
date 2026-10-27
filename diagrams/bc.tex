@@ -1,0 +1,12 @@
+\begin{tikzpicture}[card]
+  \fill[black!12] (60,40) rectangle (114.4,108);   % confidence interval of agent i (grey: a region)
+  \draw[axis, ->] (14,76) -- (188,76);
+  \foreach \x in {32.8, 44, 148, 167.2} \node[v, r=5] at (\x,76) {};   % too far: ignored
+  \foreach \x in {68, 100, 112.8} \node[f, r=5] at (\x,76) {};      % within reach: heard
+  \node[f, r=8] (i) at (87.2,76) {};
+  \node[below=1pt, font=\scriptsize] at (i.south) {$i$};
+  \draw[<->] (87.2,48) -- node[above, font=\scriptsize] {$\varepsilon$} (114.4,48);
+  \draw (20,73) -- (20,79) node[below, note] {$0$};
+  \draw (180,73) -- (180,79) node[below, note] {$1$};
+  \node[note] at (100,124) {opinion axis: $i$ listens only within $\pm\varepsilon$};
+\end{tikzpicture}

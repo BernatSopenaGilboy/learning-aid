@@ -1,0 +1,14 @@
+\begin{tikzpicture}[card]
+  \node[v, r=9, font=\scriptsize] (X) at (38,66) {$X$};
+  \foreach \i in {0,...,3} {
+    \node[v, r=4.5] (x\i) at ([shift={(38,66)}] {45+90*\i}:28) {};
+    \draw (X) -- (x\i);
+  }
+  \node[f, r=11, font=\scriptsize] (Y) at (140,66) {$Y$};
+  \node[f, r=8] (u) at (140,30) {};
+  \node[f, r=8] (w) at (140,102) {};
+  \draw[hl] (Y) -- (u) (Y) -- (w);
+  \foreach \x/\y in {112/14, 168/14}  { \node[v, r=4] (t) at (\x,\y) {}; \draw (u) -- (t); }
+  \foreach \x/\y in {112/118, 168/118} { \node[v, r=4] (t) at (\x,\y) {}; \draw (w) -- (t); }
+  \node[note] at (100,134) {few ties, but to well-connected nodes};
+\end{tikzpicture}
