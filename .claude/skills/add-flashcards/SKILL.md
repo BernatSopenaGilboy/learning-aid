@@ -87,7 +87,7 @@ Build and preview:
 ```bash
 node build-diagrams.js          # only changed diagrams; --all to rebuild everything; or list ids
 ```
-To eyeball diagrams in light and dark, serve the folder and open `diagrams/build/preview.html` (git-ignored scratch page), or just the Browse tab.
+Every build also writes `diagrams/build/preview.html`: all diagrams side by side in light and dark (add `#id1,id2` to the URL to show only some). Look at a new diagram there, or in the app's Browse tab with both themes (◐).
 
 ## Validate
 

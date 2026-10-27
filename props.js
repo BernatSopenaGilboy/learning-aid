@@ -1,5 +1,6 @@
 /* Propositions. Front: a claim.  Back: the argument / theory / proof sketch behind it.
-   { id, name: claim, def: argument (HTML ok), src: where it comes from, ref: id of a concept whose diagram decorates the back } */
+   { id, name: claim, def: argument, src: where it comes from, ref: id of a concept whose diagram decorates the back }
+   Text can use LaTeX ($…$, \[…\], \emph{}); write fields with backslashes as String.raw`…`. See the add-flashcards skill. */
 const PROPS = [
   { id: 'p-er-giant', name: 'In a random graph G(n,p), a giant component appears abruptly when the mean degree ⟨k⟩ passes 1.',
     def: 'Explore from a random node: each neighbour has on average ⟨k⟩ further neighbours (Poisson degrees). This is a branching process. If ⟨k⟩ &lt; 1 each generation shrinks and the cluster dies out (components are O(log n)). If ⟨k⟩ &gt; 1 the process survives with positive probability, and the giant component\'s fraction S solves <code>S = 1 − e^(−⟨k⟩S)</code>. S is zero below ⟨k⟩ = 1 and grows continuously above it: a phase transition.',
