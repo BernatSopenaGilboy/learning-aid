@@ -1,0 +1,17 @@
+\begin{tikzpicture}[card]
+  % the same eight nodes in three panels; links added at random from left to right
+  \begin{scope}[shift={(35,60)}, xscale=0.72]
+    \foreach \x/\y [count=\i] in {-20/-28, 4/-32, 22/-18, -24/0, 0/-6, 20/8, -14/26, 12/30} \node[v] (a\i) at (\x,\y) {};
+    \draw (a1) -- (a2) (a6) -- (a8);
+  \end{scope}
+  \begin{scope}[shift={(100,60)}, xscale=0.72]
+    \foreach \x/\y [count=\i] in {-20/-28, 4/-32, 22/-18, -24/0, 0/-6, 20/8, -14/26, 12/30} \node[v] (b\i) at (\x,\y) {};
+    \draw (b1) -- (b2) -- (b5) (b4) -- (b7) (b6) -- (b8);
+  \end{scope}
+  \begin{scope}[shift={(165,60)}, xscale=0.72]
+    \foreach \x/\y/\s [count=\i] in {-20/-28/f, 4/-32/f, 22/-18/f, -24/0/f, 0/-6/f, 20/8/f, -14/26/v, 12/30/f} \node[\s] (c\i) at (\x,\y) {};
+    \draw (c1) -- (c2) -- (c3) -- (c6) -- (c5) -- (c2) (c5) -- (c4) -- (c1) (c6) -- (c8);
+  \end{scope}
+  \draw[axis, ->] (14,108) -- (186,108);
+  \node[note] at (100,126) {the same nodes as $p$ grows};
+\end{tikzpicture}
